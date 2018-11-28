@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">DZAnalytics</string>
+    <string name="title_activity_campaign_list">campaign_list</string>
+    <string name="title_activity_campaign_detail">campaign_detail</string>
+</resources>
