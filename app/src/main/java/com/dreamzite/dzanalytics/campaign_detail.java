@@ -4,11 +4,17 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
+import android.widget.LinearLayout;
+import android.widget.TableLayout;
+import android.widget.TableRow;
+import android.widget.TextView;
 
 import com.dreamzite.dzanalytics.model.Campaign;
 import com.dreamzite.dzanalytics.model.Tweet;
 import com.dreamzite.dzanalytics.model.TweetCount;
 import com.dreamzite.dzanalytics.model.TweetInfo;
+import com.dreamzite.dzanalytics.model.TwitterUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,6 +44,55 @@ public class campaign_detail extends AppCompatActivity {
         int id = (int) b.get("id");
 
         new JSONTask().execute("http://api.metweecs.com/campaign/poll/" + id);
+    }
+
+    public static long getAllLikes(ArrayList<TweetInfo> tweetInfo) {
+        long likesCount = 0;
+
+        for (TweetInfo t : tweetInfo) {
+            ArrayList<Tweet> tweets = t.getTweets();
+            for (Tweet tw : tweets) {
+                likesCount = likesCount + tw.getLikes();
+            }
+        }
+
+        return likesCount;
+    }
+
+    public static long getAllLikesFromtweetInfo(TweetInfo tweetInfo) {
+        long likesCount = 0;
+
+            ArrayList<Tweet> tweets = tweetInfo.getTweets();
+            for (Tweet tw : tweets) {
+                likesCount = likesCount + tw.getLikes();
+        }
+
+        return likesCount;
+    }
+
+    public static long getAllRetweetsFromtweetInfo(TweetInfo tweetInfo) {
+        long retweetsCount = 0;
+
+            ArrayList<Tweet> tweets = tweetInfo.getTweets();
+            for (Tweet tw : tweets) {
+                retweetsCount = retweetsCount + tw.getRewteets();
+            }
+
+        return retweetsCount;
+    }
+
+
+    public static long getAllRetweets(ArrayList<TweetInfo> tweetInfo) {
+        long retweetsCount = 0;
+
+        for (TweetInfo t : tweetInfo) {
+            ArrayList<Tweet> tweets = t.getTweets();
+            for (Tweet tw : tweets) {
+                retweetsCount = retweetsCount + tw.getRewteets();
+            }
+        }
+
+        return retweetsCount;
     }
 
     public class JSONTask extends AsyncTask<String,String, String> {
@@ -162,10 +217,100 @@ public class campaign_detail extends AppCompatActivity {
                 String dateStartAt = new SimpleDateFormat("yyy-MM-dd HH:mm:ss").format(new Date(startAt));
                 Campaign campaign = new Campaign(status, id, name, hashtag, user, dateStartAt, isActive, tweetCounts, tweetInfos);
 
+                // -----------------------
+                // Fill the informations
+                // -----------------------
+                LinearLayout linearLayout = findViewById(R.id.details);
+
+                // Set the title of the activity
+                String title = campaign.getName();
+                if (campaign.getHashtag().equals("null"))
+                    title = title + " @" + campaign.getUser();
+                else
+                    title = title + " @" + campaign.getHashtag();
+
+                setTitle(title);
+
+                // Fill the start date
+                TextView tvStratDate = findViewById(R.id.startAt);
+                tvStratDate.setText(campaign.getStartAt());
+
+                // Fille informations about tweets
+                TextView tvLikesCount = new TextView(campaign_detail.this);
+                long likesCount = getAllLikes(campaign.getTweetInfo());
+                tvLikesCount.setText("Likes : " + likesCount);
+                linearLayout.addView(tvLikesCount);
+
+                TextView tvRetweetsCount = new TextView(campaign_detail.this);
+                long retweetsCount = getAllRetweets(campaign.getTweetInfo());
+                tvRetweetsCount.setText("Retweets : " + retweetsCount);
+                linearLayout.addView(tvRetweetsCount);
+
+                // Number of tweets for last timestamp
+                ArrayList<TweetCount> tweetCountsArrayForDisplay = campaign.getTweetCounts();
+                TweetCount lastTweetCount = tweetCountsArrayForDisplay.get(tweetCountsArrayForDisplay.size() - 1);
+                TextView tvTitleLastTweetCount = new TextView(campaign_detail.this);
+                tvTitleLastTweetCount.setText("Dernières informations de la campagne");
+                tvTitleLastTweetCount.setGravity(Gravity.CENTER);
+                linearLayout.addView(tvTitleLastTweetCount);
+
+                TextView tvTweetCountDate = new TextView(campaign_detail.this);
+                tvTweetCountDate.setText( "Date : " + lastTweetCount.getDate());
+                linearLayout.addView(tvTweetCountDate);
+
+                TextView tvTweetCountLikes = new TextView(campaign_detail.this);
+                tvTweetCountLikes.setText( "Nombre de tweet : " + lastTweetCount.getCount());
+                linearLayout.addView(tvTweetCountLikes);
+
+                // Number of retweets and like for last timestamp
+                ArrayList<TweetInfo> tweetInfoArrayForDisplay = campaign.getTweetInfo();
+                TweetInfo lastTweetInfo = tweetInfoArrayForDisplay.get(tweetInfoArrayForDisplay.size() - 1);
+                TextView tvTitleLastTweetInfo = new TextView(campaign_detail.this);
+                tvTitleLastTweetInfo.setText("Dernières informations des tweets");
+                tvTitleLastTweetInfo.setGravity(Gravity.CENTER);
+                linearLayout.addView(tvTitleLastTweetInfo);
+
+                TextView tvTweetInfoDate = new TextView(campaign_detail.this);
+                tvTweetInfoDate.setText( "Date : " + lastTweetInfo.getDate());
+                linearLayout.addView(tvTweetInfoDate);
+
+                TextView tvTweetInfoRetweets = new TextView(campaign_detail.this);
+                long tweetInfoRetweets = getAllRetweetsFromtweetInfo(lastTweetInfo);
+                tvTweetInfoRetweets.setText( "Nombre de retweets : " + tweetInfoRetweets);
+                linearLayout.addView(tvTweetInfoRetweets);
+
+                TextView tvTweetInfoLikes = new TextView(campaign_detail.this);
+                long tweetInfoLikes = getAllLikesFromtweetInfo(lastTweetInfo);
+                tvTweetInfoLikes.setText( "Nombre de likes : " + tweetInfoLikes);
+                linearLayout.addView(tvTweetInfoLikes);
+
+                // Statistics on retweets and likes
+                TweetInfo lastTweetInfo2 = tweetInfoArrayForDisplay.get(tweetInfoArrayForDisplay.size() - 2);
+                TextView tvTitleStats = new TextView(campaign_detail.this);
+                tvTitleStats.setText("Statistiques");
+                tvTitleStats.setGravity(Gravity.CENTER);
+                linearLayout.addView(tvTitleStats);
+
+                float likesStats1 = getAllLikesFromtweetInfo(lastTweetInfo);
+                float retweetsStats1 = getAllRetweetsFromtweetInfo(lastTweetInfo);
+
+                float likesStats2 = getAllLikesFromtweetInfo(lastTweetInfo2);
+                float retweetsStats2 = getAllRetweetsFromtweetInfo(lastTweetInfo2);
+
+                float evolutionRetweets = 100 - (retweetsStats2 / retweetsStats1 * 100);
+                float evolutionLikes = 100 - (likesStats2 / likesStats1 * 100);
+
+                TextView tvEvolutionRetweets = new TextView(campaign_detail.this);
+                tvEvolutionRetweets.setText("Evolution des retweets : " + evolutionRetweets + "%");
+                linearLayout.addView(tvEvolutionRetweets);
+
+                TextView tvEvolutionLikes = new TextView(campaign_detail.this);
+                tvEvolutionLikes.setText("Evolution des likes : " + evolutionLikes + "%");
+                linearLayout.addView(tvEvolutionLikes);
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
         }
     }
 }

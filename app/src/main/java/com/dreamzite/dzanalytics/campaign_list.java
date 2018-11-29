@@ -1,12 +1,19 @@
 package com.dreamzite.dzanalytics;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.dreamzite.dzanalytics.model.Campaigns;
@@ -32,10 +39,12 @@ public class campaign_list extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_campaign_list);
+        setContentView(R.layout.content_campaign_list);
+        setTitle("Liste des campagnes");
 
         campaigns = new ArrayList<>();
-        campaignsList = findViewById(R.id.campaings);
+        //scrollView = findViewById(R.id.scroll);
+        campaignsList = findViewById(R.id.campaigns);
         new JSONTask().execute("http://api.metweecs.com/campaign/list");
     }
 
@@ -108,12 +117,23 @@ public class campaign_list extends AppCompatActivity {
                     TextView campaignName = new TextView(campaign_list.this);
                     campaignName.setId(c.getId());
                     campaignName.setText(c.getName());
+                    campaignName.setGravity(Gravity.CENTER);
+                    campaignName.setHeight(100);
+                    campaignName.setTextSize(20);
+                    campaignName.setTypeface(null, Typeface.BOLD);
                     final Button goToCampaign = new Button(campaign_list.this);
                     goToCampaign.setId(c.getId());
                     goToCampaign.setText("Voir les informations");
+                    goToCampaign.setTextColor(Color.WHITE);
+                    //goToCampaign.setBackgroundColor(Color.parseColor("#0080ff"));
+                    Drawable buttonSHape = getResources().getDrawable(R.drawable.button_shape);
+                    goToCampaign.setBackgroundDrawable(buttonSHape);
                     campaignsList.addView(campaignName);
                     campaignsList.addView(goToCampaign);
                     final int id = goToCampaign.getId();
+
+                    goToCampaign.setWidth(40);
+
                     goToCampaign.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
