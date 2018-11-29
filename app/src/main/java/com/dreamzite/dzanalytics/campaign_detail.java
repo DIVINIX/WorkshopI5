@@ -235,15 +235,19 @@ public class campaign_detail extends AppCompatActivity {
                 TextView tvStratDate = findViewById(R.id.startAt);
                 tvStratDate.setText(campaign.getStartAt());
 
+                //
+                ArrayList<TweetInfo> tweetInfoArrayForDisplay = campaign.getTweetInfo();
+                TweetInfo lastTweetInfo = tweetInfoArrayForDisplay.get(tweetInfoArrayForDisplay.size() - 1);
+                long tweetInfoRetweets = getAllRetweetsFromtweetInfo(lastTweetInfo);
+                long tweetInfoLikes = getAllLikesFromtweetInfo(lastTweetInfo);
+
                 // Fille informations about tweets
                 TextView tvLikesCount = new TextView(campaign_detail.this);
-                long likesCount = getAllLikes(campaign.getTweetInfo());
-                tvLikesCount.setText("Likes : " + likesCount);
+                tvLikesCount.setText("Likes : " + tweetInfoLikes);
                 linearLayout.addView(tvLikesCount);
 
                 TextView tvRetweetsCount = new TextView(campaign_detail.this);
-                long retweetsCount = getAllRetweets(campaign.getTweetInfo());
-                tvRetweetsCount.setText("Retweets : " + retweetsCount);
+                tvRetweetsCount.setText("Retweets : " + tweetInfoRetweets);
                 linearLayout.addView(tvRetweetsCount);
 
                 // Number of tweets for last timestamp
@@ -263,8 +267,6 @@ public class campaign_detail extends AppCompatActivity {
                 linearLayout.addView(tvTweetCountLikes);
 
                 // Number of retweets and like for last timestamp
-                ArrayList<TweetInfo> tweetInfoArrayForDisplay = campaign.getTweetInfo();
-                TweetInfo lastTweetInfo = tweetInfoArrayForDisplay.get(tweetInfoArrayForDisplay.size() - 1);
                 TextView tvTitleLastTweetInfo = new TextView(campaign_detail.this);
                 tvTitleLastTweetInfo.setText("Dernières informations des tweets");
                 tvTitleLastTweetInfo.setGravity(Gravity.CENTER);
@@ -275,12 +277,11 @@ public class campaign_detail extends AppCompatActivity {
                 linearLayout.addView(tvTweetInfoDate);
 
                 TextView tvTweetInfoRetweets = new TextView(campaign_detail.this);
-                long tweetInfoRetweets = getAllRetweetsFromtweetInfo(lastTweetInfo);
+
                 tvTweetInfoRetweets.setText( "Nombre de retweets : " + tweetInfoRetweets);
                 linearLayout.addView(tvTweetInfoRetweets);
 
                 TextView tvTweetInfoLikes = new TextView(campaign_detail.this);
-                long tweetInfoLikes = getAllLikesFromtweetInfo(lastTweetInfo);
                 tvTweetInfoLikes.setText( "Nombre de likes : " + tweetInfoLikes);
                 linearLayout.addView(tvTweetInfoLikes);
 
